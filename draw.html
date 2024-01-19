@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #pallet {
+            margin-bottom: 10px;
+        }
+
+        #pallet button img {
+            width: 100px;
+            height: 50px;
+        }
+
+        #file {
+            margin-bottom: 10px;
+        }
+
+        #board {
+            width: 1000px;
+            height: 600px;
+            border: 1px solid black;
+            position: relative;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="draw">
+        <div id="pallet">
+            <button class="shapes">
+                <img src="https://static.vecteezy.com/system/resources/previews/019/939/816/non_2x/wooden-round-table-object-free-png.png"
+                    alt="">
+            </button>
+        </div>
+        <div id="file">
+            <button id="save">SAVE</button>
+            <button id="load">LOAD</button>
+            <button id="clear">CLEAR SAVED DATA</button>
+        </div>
+        <div id="board">
+
+        </div>
+    </div>
+
+
+    <script>
+        var selectedItem = null;
+        var buttons = document.getElementsByClassName('shapes');
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener("click", function (event) {
+                if (selectedItem) {
+                    selectedItem = null;
+                    event.target.parentElement.style.border = '';
+                }
+                else {
+                    selectedItem = event.srcElement.currentSrc;
+                    event.target.parentElement.style.border = '2px solid';
+                }
+            });
+        }
+
+        document.getElementById("board").addEventListener("click", function (event) {
+            if (selectedItem) {
+                const imageWidth = 100;
+                const imageHeight = 50;
+                if (
+                    ((imageHeight / 2) <= event.layerY) &&
+                    ((event.layerY + (imageHeight / 2)) < 600) &&
+                    ((imageWidth / 2) <= event.layerX) &&
+                    ((event.layerX + (imageWidth / 2)) < 1000)
+                ) {
+                    const image = document.createElement("img");
+                    image.src = selectedItem;
+                    image.className = 'board-element';
+                    image.style.width = '100px';
+                    image.style.height = '50px';
+                    image.style.position = 'absolute';
+                    image.style.top = ((event.layerY - (imageHeight / 2)) + 'px');
+                    image.style.left = ((event.layerX - (imageWidth / 2)) + 'px');
+                    image.style.border = '1px solid';
+                    image.style.cursor = 'pointer';
+                    image.onclick = function (e) {
+                        e.target.remove();
+                    }
+
+                    event.target.appendChild(image);
+                }
+            }
+            else {
+                if (event.target.tagName != 'IMG') {
+                    alert('please select image');
+                }
+            }
+        });
+
+        document.getElementById("save").addEventListener("click", function (event) {
+            localStorage.setItem('save_drawing', document.getElementById('board').innerHTML);
+            document.getElementById('board').innerHTML = '';
+        });
+
+        document.getElementById("load").addEventListener("click", function () {
+            document.getElementById('board').innerHTML = localStorage.getItem('save_drawing');
+            var el = document.getElementsByClassName('board-element');
+            for (let i = 0; i < el.length; i++) {
+                el[i].addEventListener("click", function (event) {
+                    event.target.remove();
+                });
+            }
+        });
+
+        document.getElementById("clear").addEventListener("click", function (event) {
+            document.getElementById('board').innerHTML = '';
+            localStorage.setItem('save_drawing', '');
+        });
+    </script>
+</body>
+
+</html>
